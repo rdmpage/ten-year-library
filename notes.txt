@@ -1,0 +1,231 @@
+
+
+# Ten years building a taxonomic library: linking names for animals, plants, and fungi to publications and people
+
+
+
+https://blog.pensoft.net/2023/03/06/bicikl-project-supports-article-collection-in-biodiversity-data-journal-about-use-of-linked-data/
+
+
+
+
+## Abstract
+
+
+This paper documents several datasets. The mapping between taxonomic names and publications are store din ChecklistBank (the infrastructure that underpins the Catalogue of Life). These mappings are also available in linked data format and hence can be queried using a triple store. A mapping between ORCIDs and publications is also included.
+
+
+## Introduction
+
+Bob May quote
+
+Despite the oft-quoted centrality of taxonomy to the study of biodiversity, we still lack detailed knowledge on taxa and the people who study them.
+
+
+
+In its simplest form the goal of this work is a pair of persistent identifiers, one for a taxonomic name, and one for the publication that first made that name available. For example, () is the LSID for a name and the DOI for the its publication. 
+
+
+
+The primary reason for linking names to literature is provide evidence for that name. Without resolvable links to the taxonomic literature our taxonomic databases it is likely that taxonomic information we continue to languish in silos.
+
+A practical reason for 
+
+
+
+There is also the potential to develop measures of 
+
+
+
+## Persistent identifiers
+
+
+The value of persistent identifiers is a combination of their persistence and resolvability. Persistence means that the identifiers will be sufficiently long lived that anyone can incorporate them into their local databases and be confident that those identifiers will still be meaningful over the lifetime of that project. If this longevity can't be asserted with confidence then building upon those identifiers becomes a risk, and the end result is those identifiers will not achieve wide use. Without wide use we fail to gain one of the key benefits of persistent identifiers, namely using them to make links between entities across different databases.
+
+Resolvability is the notion that identifiers are not merely "dumb" strings but they are actionable. If I have a DOI I can append it to https://doi.org/ and in a web browser get access to the corresponding article. Or I can append the DOI to a web service and retrieve metadata for an article in a range of machine-readable formats. This support of both human and machine readability facilitates developing services that build upon those identifiers (this is discussed further below).
+
+In this work I concentrate on identifiers such as LSIDs and DOIs. These can be thought of as "location based" identifiers, that is, they specify a location where one can retrieve information about a digital entity, and potentially retrieve that entity itself. Location-based  identifiers emphasise the persistence of resolution (for example through a centralised resolver) but typically make no guarantees that the content returned persists unchanged over time. For example, academic publishers may update the metadata for an article but the DOI remains unchanged.
+
+Another approach to persistent identifiers uses cryptographic hashes of the content as the identifier. This has the advantage of ensuring that the data requested hasn't changed (by comparing the hash identifier with the hash of the data itself). Unlike DOIs and similar identifiers, there is typically no centralised mechanism to resolve hash-based identifiers. Decentralised systems have been developed, but it is unclear if they themselves will persist.
+
+
+### Persistent identifiers for taxon names
+
+Despite benign neglect by the wider biodiversity informatics community, LSIDs remain one of the most widely deployed persistent identifiers in biodiversity. The identifier is a URN and typically resolves to RDF. 
+
+
+### Persistent identifiers for literature
+
+Taxonomic databases cite the literature at various levels of granularity, such as a book or a journal, an individual article, or a page (or pages) within a book or article. 
+
+
+
+In this work I will focus on "citable" identifiers, that is, identifiers that are typically cited by other publications. In practical terms this means DOIs. Databases such as ION return article-level data so this is a close match. But databases such as IPNI and IF....
+
+
+#### Page-level identifiers
+
+Citations at the page level have been termed "microcitations" and are analagous to what the U.S. legal profession refers to as "point citations" or "pincites". 
+
+Some bibliographic databases support page-level identifiers. For exaaple, indvidual pages in BHL have their own unique URL. In cases where there isn't an explicit identifier we can use fragment identifiers [ref] which identify parts of an entity. For instance, an individual page in a PDF can be referred to using the fragment #page=n where n is the position of the page within the PDF, starting from n=1 for the first page. Blocks of text within a page can be identified using TextQuotes or TextPosition identifiers [ref]. These identifiers are standard components of the W3C annotation model, and are supported by tools such as hypothes.is.
+
+
+For media that isn't paged we can use other approaches (xpath, JATS).
+
+
+
+Note that fragment identifiers typically only make sense in the context of a specific file. It is not uncommon for publishers, digital repositories, or bibliographic sites such as Researchgate to add cover pages to a PDF, which could render invalid #page fragment identifiers derived for another verison of the PDF.
+
+One apporach to ensuring consistencey of location is to store a unique identifier for the media being annotated such as a cryptographic hash of the file. PDFs typically include an internal identifier which can also be used (hypothes.is). 
+
+Another apoorahc is to use  multiple fragmebnt identiifers for the same annotation, and endeavour to find the best match between those identifiers and whichever version of the media the user has to hand. 
+
+
+
+#### Challenges of mapping microcitatioons
+
+Need source metadata to have page numbers, some journals don't e.g. European Journal of Taxonomy in 1,201 articles from 2011 - 2023 only 243 had a page range in the CrossRef metadata.
+
+#### against opaque identifiers
+
+10.3389/fmicb.2021.737541 masppiung using identifier names.
+
+
+### Persistent identifiers for people
+
+Although not the focus of this work, ...
+
+
+### Multiple identifiers
+
+The role of wikidata...
+
+
+### Storing mappings
+
+In addition to the challenge of creating these mappings, there is the problem of how to make them available for reuse. Ideally the source taxonomic databases would incorporate them, on the grounds that they would add value to their users, and it would save those databases doing the work themselves. However, this assumes that those databases have the resources to incorporate this additional data, which seems to rarely be the case. Alternative approaches include developing separate, stand alone web sites to make the data available (e.g., BioNames), or simply putting a data dump in a repository. [pros and cons]
+
+
+In 2018 I explored an intermediate approach of using Datasette's to publish a mapping between IPNI names and the literature. This made the data available, wrapped in a generic interface. Hence the data was queryable, but the interface doesn't support any taxonomic-specific queries. 
+
+Since then the release of ChecklistBank has provided a way to publish the data to complement existing databases. ChecklistBank includes all the taxonomic checklists used to create the Catalogue of Life, but also enables users to upload their own checklists. This means that we can take a taxonomic checklist, add persistent identifiers for the literature, then upload the augmented data to ChecklistBank as a new dataset (with an appropriate citation to the source database). This augmented checklist can have its own DOI and be citable (hence providing a mechanism to give credit to those doing the annotation). Becase the augmented dataset uses the same taxon name identifiers as the original database, this also means that at any point the original data publishers could incorporate literture mapping into their own databases. Likewise, any other database that uses those same taxon name identifiers could also use the mapping. For example the World Flora Online lacks bibliographic identifiers for plant names, but because they include IPNI identifiers for many of the plant names it would be trivial to add 
+
+
+### Applications
+
+To demonstrate the utility of the mapping I provide an app called "Species-Cite" which makes use of the ChecklistBank API to rpovide a simple service where someone can get a citation for a scientific name [explain]
+
+Triplestore as another example
+
+
+
+
+
+### Scope
+
+
+Animals, plants, and fungi
+
+For the purposes of this paper I am going to restrict myself to three databases, each of which uses LSIDs as persistent identifiers for taxonomic names. This gives us substantial coverage of animals, plants, and fungi.
+
+This does not mean that these are the only databases which can be linked, but they are the three largest.
+
+
+
+## Methods
+
+
+LSID - RDF, map to literature, output
+
+
+
+#### Page-level identifiers
+
+use page range to get fragment ids.
+
+
+### nomen tool to display coverage
+
+discuss how data managed and visualised
+
+
+
+### Coverage diagrams
+
+### Taxonomic coverage?
+
+
+### Publishing to Zenodo and ChcklustBank
+
+
+## Results
+
+
+### Satts
+
+### Coverage
+
+### Datasets and DOIs
+
+
+
+## Discussion
+
+
+
+
+### Advantages of PIDs for literature
+
+
+Persistent identifiers for publications are at the heart of the "citation graph", where nodes in the graph are articles and the edges represent one article citing another. Taxonomists have often felt poorly served by metrics based on the citation graph (e.g., impact factor), but the graph also enables us to track the fate of taxonomic concepts, and discover related research through co-citation.  
+
+
+Persistent identifiers for literature open up other linking possibilties. The growing adoption of ORCIDs as personal identifiers means that we can potentially link taxonomists to their publiucations and hence to the taxonomic names they have published. ... This paper demonstrates some of these possibilkities by using ORCID. 
+
+PIDs also enable us to make use of the broader ecosystem.
+
+For example, we could ask how much of the recent taxonomic liutertaure is only available behind a paywall. The Unpaywall service can take a DOI and determine whether there is a version available for free (either with an explicit open access license, or simply available ).
+
+### Availability of literature
+
+
+
+
+
+### Future directions
+
+Credit for taxonomists (citation of their work by databases?)
+
+Inclusion of treatments via Zenodo (requires listing all treatments)
+
+Incusion of citaiom graph, lck of graph for phytotaxa and zootaxa (cxoye datasets)
+
+Inclusion of funding information
+
+Link to DNA sequences
+
+Link to TreeBASE
+
+Do we build our own ts or use wikidata?
+
+How do we encourage using these results?
+
+Literature as the greta connector
+
+Interfaces, e.g Miller columns
+
+
+https://iphylo.blogspot.com/2022/08/can-we-use-citation-graph-to-measure.html
+
+
+
+https://iphylo.blogspot.com/2022/08/linking-taxonomic-names-to-literature.html
+
+https://iphylo.blogspot.com/2022/09/does-anyone-cite-taxonomic-treatments.html
+
+
+
+
+
+
+
