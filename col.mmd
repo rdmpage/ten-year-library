@@ -1,0 +1,9 @@
+graph LR
+T((Taxon)) -- identifier --> TI((PropertyValue))
+T((Taxon)) -- scientificName --> TN((TaxonName))
+TN((TaxonName)) -- isBasedOn --> S(ScholarlyArticle)
+T((Taxon)) -- alternateScientificName --> ATN((TaxonName))
+ATN((TaxonName)) -- isBasedOn --> S((ScholarlyArticle))
+
+T((Taxon)) -- parentTaxon --> PT((Taxon))
+
