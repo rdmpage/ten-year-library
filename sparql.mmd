@@ -1,0 +1,12 @@
+graph 
+%% T((Taxon)) -- scientificName --> TN((TaxonName))
+TN((TaxonName)) -- isBasedOn --> S(CreativeWork)
+S(CreativeWork) -- creator --> P((Person))
+%%P((Person)) -- address --> PO(PostalAddress)
+%%P((Person)) -- affiliation --> O(Organisation)
+%%P((Person)) -- alumniOf --> O(Organization)
+%%O(Organization) -- name --> ?name
+P((Person)) -- affiliation --> O(Organization)
+O(Organization) -- identifier --> I((PropertyValue))
+I((PropertyValue)) -- propertyID --> RINGGOLD
+I((PropertyValue)) -- value --> 41803

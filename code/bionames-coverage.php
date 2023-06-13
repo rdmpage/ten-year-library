@@ -14,17 +14,26 @@ $ADODB_FETCH_MODE = ADODB_FETCH_ASSOC;
 
 $db->EXECUTE("set names 'utf8'"); 
 
-$sql = 'SELECT COUNT(id) AS count, journal AS container, 10*FLOOR(year/10) AS decade 
+
+$force = false;
+//$force = true;
+
+if (!file_exists('bionames.json') || $force)
+{
+	$sql = 'SELECT COUNT(id) AS count, journal AS container, 10*FLOOR(year/10) AS decade 
 		FROM names 
 		WHERE journal IS NOT NULL AND year IS NOT NULL				 
-		GROUP BY container, decade;';
+		GROUP BY container, decade;';		
 		
-		
-$limit = 50;
+	$limit = 50;
 
-$coverage = get_coverage_mysql($db, $sql, $limit);
+	$coverage = get_coverage_mysql($db, $sql, $limit);
 
-file_put_contents('bionames.json', json_encode($coverage));
+	file_put_contents('bionames.json', json_encode($coverage));
+}
+
+$json = file_get_contents('bionames.json');
+$coverage = json_decode($json, true);
 
 
 // add counts
@@ -40,7 +49,7 @@ print_r($coverage);
 
 // displayImage
 
-$html = to_html($coverage);
+$html = to_html($coverage, '#1E90FF');
 
 file_put_contents('animals.html', $html);
 

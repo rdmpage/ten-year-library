@@ -6,16 +6,27 @@ require_once('coverage-decade.php');
 
 $database_filename = 'sqlite:/Users/rpage/Development/index-fungorum-coldp/if.db';
 
-$sql = 'SELECT COUNT(id) AS count, title AS container, year/10 * 10 AS decade 
-		FROM names 
-		WHERE title IS NOT NULL AND year IS NOT NULL				 
-		GROUP BY title, decade;';
+$force = false;
+//$force = true;
+
+if (!file_exists('if.json') || $force)
+{
+
+
+	$sql = 'SELECT COUNT(id) AS count, title AS container, year/10 * 10 AS decade 
+			FROM names 
+			WHERE title IS NOT NULL AND year IS NOT NULL				 
+			GROUP BY title, decade;';
 		
-$limit = 50;
+	$limit = 50;
 
-$coverage = get_coverage($database_filename, $sql, $limit);
+	$coverage = get_coverage($database_filename, $sql, $limit);
 
-file_put_contents('if.json', json_encode($coverage));
+	file_put_contents('if.json', json_encode($coverage));
+}
+
+$json = file_get_contents('if.json');
+$coverage = json_decode($json, true);
 
 
 // add counts
@@ -31,7 +42,7 @@ print_r($coverage);
 
 // displayImage
 
-$html = to_html($coverage);
+$html = to_html($coverage, '#F52887');
 
 file_put_contents('fungi.html', $html);
 

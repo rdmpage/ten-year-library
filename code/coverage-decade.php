@@ -252,7 +252,14 @@ function add_counts($database_filename, $sql, $coverage)
 	
 		$data = do_sqlite_query($pdo, $query_sql);
 	
-		$container_data->matched = $data[0]->count;
+		if (is_array($container_data))
+		{
+			$container_data['matched'] = $data[0]->count;
+		}
+		else
+		{
+			$container_data->matched = $data[0]->count;
+		}
 	
 	}
 
@@ -273,7 +280,14 @@ function add_counts_mysql($db, $sql, $coverage)
 	
 		$data = do_mysql_query($db, $query_sql);
 	
-		$container_data->matched = $data[0]->count;
+		if (is_array($container_data))
+		{
+			$container_data['matched'] = $data[0]->count;
+		}
+		else
+		{
+			$container_data->matched = $data[0]->count;
+		}
 	
 	}
 
@@ -282,16 +296,24 @@ function add_counts_mysql($db, $sql, $coverage)
 
 
 //----------------------------------------------------------------------------------------
-function to_html($obj)
+function to_html($obj, $colour="green")
 {
 	$html = '';
 	
-	$html .=  '<table cellspacing="0">';
+	$html .=  '<table style="font-family:Arial;" cellspacing="0">';
 
 	$html .=  '<tr>';
-	$html .=  '<td style="text-align:center;">Container</td>';
+	$html .=  '<td style="text-align:center;"><b>Container</b></td>';
+	
+	$html .=  '<td  colspan="28"  style="text-align: center;" ><b>Decades</b></td>';
 
+	// stats
+	$html .=  '<td style="" halign="center"><b>PIDs</b></td>';
+	$html .=  '</tr>';
 
+	$html .=  '<tr>';
+	$html .=  '<td></td>';
+	
 		for ($decade = 1750; $decade < 2030; $decade += 10)
 		{
 			$html .=  '<td style="border-bottom:1px solid black;">';
@@ -300,9 +322,9 @@ function to_html($obj)
 			$html .=  '</span>';
 			$html .=  '</td>';
 		}
+		
+	$html .=  '<td></td>';		
 	
-		// stats
-		$html .=  '<td style="border-bottom:1px solid black;" halign="center">Matched</td>';
 
 
 	$html .=  '</tr>';
@@ -323,7 +345,7 @@ function to_html($obj)
 			
 			if (isset($data->decades[$decade]))
 			{
-				$html .=  'background-color:green;';
+				$html .=  'background-color:' . $colour . ';';
 			
 				$x = min(4, round(log10($data->decades[$decade])));
 			
@@ -331,7 +353,18 @@ function to_html($obj)
 			}
 			else
 			{
-				$html .=  'background-color:white;';
+				if (isset($data['decades'][$decade]))
+				{
+					$html .=  'background-color:' . $colour . ';';
+			
+					$x = min(4, round(log10($data['decades'][$decade])));
+			
+					$html .=  'opacity:' . $x * 0.25 . ';';
+				}
+				else
+				{
+					$html .=  'background-color:white;';
+				}
 			}
 		
 			$html .=  '">';
@@ -351,6 +384,15 @@ function to_html($obj)
 		
 			$html .=  '<div style="display:block;background-color:#999;width:' . $percentage . '%;height:1em;"></div>';
 		}
+		
+		if (isset($data['matched']))
+		{
+			$percentage = round(100 * $data['matched']/$data['total']);
+			//$html .=  $percentage;
+		
+			$html .=  '<div style="display:block;background-color:#999;width:' . $percentage . '%;height:1em;"></div>';
+		}
+		
 		$html .=  '</td>';
 		$html .=  '</tr>';
 	}

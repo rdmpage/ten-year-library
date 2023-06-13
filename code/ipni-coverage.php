@@ -4,18 +4,32 @@
 
 require_once('coverage-decade.php');
 
+
 $database_filename = 'sqlite:/Users/rpage/Development/ipni-coldp/ipni.db';
 
-$sql = 'SELECT COUNT(id) AS count, publication AS container, substr(publicationyearfull,1,4)/10 * 10 AS decade 
+
+
+$force = false;
+//$force = true;
+
+if (!file_exists('ipni.json') || $force)
+{
+
+	$sql = 'SELECT COUNT(id) AS count, publication AS container, substr(publicationyearfull,1,4)/10 * 10 AS decade 
 		FROM names 
 		WHERE publication IS NOT NULL AND publication <> "" AND publicationyearfull <> "" 
 		GROUP BY publication, decade;';				
-		
-$limit = 50;
 
-$coverage = get_coverage($database_filename, $sql, $limit);
+	$limit = 50;
 
-file_put_contents('ipni.json', json_encode($coverage));
+	$coverage = get_coverage($database_filename, $sql, $limit);
+
+	file_put_contents('ipni.json', json_encode($coverage));
+}
+
+$json = file_get_contents('ipni.json');
+$coverage = json_decode($json, true);
+
 
 
 // add counts
@@ -30,7 +44,7 @@ print_r($coverage);
 
 // displayImage
 
-$html = to_html($coverage);
+$html = to_html($coverage, '#73AC13');
 
 file_put_contents('plants.html', $html);
 
